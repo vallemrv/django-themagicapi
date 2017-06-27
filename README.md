@@ -40,7 +40,7 @@ Add 'themagicapi', 'tokenapi' and 'corsheaders' to your `INSTALLED_APPS`.
 ###These are the modifications of settings.py file:
 ```python
 #Add these lines
-PATH_DBS = os.path.join(BASE_DIR, "dbs/")
+PATH_DBS = os.path.join(BASE_DIR, "[path-of-databases]/")
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'docfiles')
 MEDIA_URL = '/docfiles/'

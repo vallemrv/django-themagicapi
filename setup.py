@@ -14,7 +14,7 @@ setup(
     author='Manuel Rodriguez',
     author_email='valle.mrv@gmail.com',
     url='https://github.com/vallemrv/django-themagicapi.git',
-    packages=['thmagicapi'],
+    packages=['themagicapi'],
     install_requires=[
           'valleorm',
           'django-tokenapi',
