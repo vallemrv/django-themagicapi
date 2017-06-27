@@ -38,7 +38,7 @@ regular installation or use [pip][]:
 Add 'themagicapi', 'tokenapi' and 'corsheaders' to your `INSTALLED_APPS`.
 
 ###These are the modifications of settings.py file:
-``python
+```python
 #Add these lines
 PATH_DBS = os.path.join(BASE_DIR, "dbs/")
 
