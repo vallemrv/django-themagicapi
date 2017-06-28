@@ -141,8 +141,8 @@ Usage
 
 For more requests see [themagic-apiserver]: https://github.com/vallemrv/themagic-apiserver.git
 
-###Requests example
--------------------
+Requests example
+----------------
 ```python
 import requests
 import json
