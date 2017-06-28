@@ -1,4 +1,5 @@
 # django-themagicapi
+
 Django application. To launch an api server without endpoint.
 Create the database on demand.
 
@@ -138,4 +139,31 @@ Usage
           }
 
 
-for more requires see [themagic-apiserver]: https://github.com/vallemrv/themagic-apiserver.git
+For more requests see [themagic-apiserver]: https://github.com/vallemrv/themagic-apiserver.git
+
+###Requests example
+-------------------
+```python
+import requests
+import json
+data = json.dumps(***someparams***)
+#for get token see https://github.com/jpulgarin/django-tokenapi.git
+token = {
+    'user': 1, #user number
+    'token': 'some token',
+    'data': data
+}
+
+r = requests.post("http://localhost:8000/", data=token)
+print r.json()
+
+```
+:scroll: License
+----------------
+
+Licensed under the Apache-2.0, see `LICENSE`
+
+:heart_eyes: Contributors
+--------------------------
+
+Manuel Rodriguez <valle.mrv@gmail.com>
