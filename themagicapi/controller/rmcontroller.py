@@ -1,3 +1,12 @@
+# @Author: Manuel Rodriguez <valle>
+# @Date:   20-Jul-2017
+# @Email:  valle.mrv@gmail.com
+# @Filename: rmcontroller.py
+# @Last modified by:   valle
+# @Last modified time: 23-Jul-2017
+# @License: Apache license vesion 2.0
+
+
 # -*- coding: utf-8 -*-
 """Controlador para themagicapi
 
@@ -12,35 +21,39 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from valleorm.models import Models
 from filecontroller import FileController
 
-
 class RmController():
     def __init__(self, JSONResponse, JSONRequire, path):
         self.JSONResponse = JSONResponse
         self.JSONRequire = JSONRequire
         self.path = path
-        JSONResponse['rm'] = []
-
         self.db = JSONRequire.get("db") if 'db' in JSONRequire.get("db") else JSONRequire.get("db")+".db"
         for k, v in JSONRequire.items():
             if k == "db":
                 pass
+            elif type(v) is list:
+                self.JSONResponse['rm'] = {k: []}
+                for item in v:
+                    self.actionGet(item, k)
             else:
+                self.JSONResponse['rm'] = {k: []}
                 self.actionGet(v, k)
 
 
 
     def actionGet(self, condition, tb):
+        if not Models.exitsTable(self.db, tb, self.path):
+            return ''
         row = Models(path=self.path, dbName=self.db, tableName=tb)
         if "ID" in condition:
             row.loadByPk(condition["ID"])
-            response = {tb:"remove:" +'1' if row.ID > 0 else '0' , 'ID': row.ID}
+            response = {'num':"remove:" +'1' if row.ID > 0 else '0' , 'ID': row.ID}
             rmRoot = True
             for col, val in condition.items():
                 if type(condition[col]) is dict:
                     rmRoot = False
                     modelCondition, subQuery = self.getModelQuery(val)
                     rows = getattr(row, col).get(modelCondition)
-                    response = {col:"remove "+str(len(rows)), 'IDs': []}
+                    response = {'num':"remove "+str(len(rows)), 'IDs': []}
 
                     for child in rows:
                         response["IDs"].append(child.ID)
@@ -57,7 +70,7 @@ class RmController():
 
                 row.remove()
 
-            self.JSONResponse["rm"].append(response)
+            self.JSONResponse["rm"][tb].append(response)
 
         else:
             mainCondition, subQuery = self.getModelQuery(condition)
@@ -69,7 +82,7 @@ class RmController():
                         rows = getattr(rowMain, fieldName).get(subNodeCondition)
                         if len(rows) > 0:
                             response = {}
-                            response[fieldName] = [{col:"remove "+str(len(rows)), 'IDs': []}]
+                            response[fieldName] = [{'num':"remove "+str(len(rows)), 'IDs': []}]
                             for row in rows:
                                 if FileController.hasFile(row):
                                     fileController = FileController(path=self.path, db=self.db)
@@ -78,10 +91,10 @@ class RmController():
                                 getattr(rowMain, fieldName).remove(row)
                                 response[fieldName]['IDs'].append(row.ID)
 
-                            self.JSONResponse["rm"].append(response)
+                            self.JSONResponse["rm"][tb].append(response)
                 else:
                     numRemoveRow += 1
-                    self.JSONResponse["rm"].append({tb:"remove: "+str(numRemoveRow), 'ID': rowMain.ID})
+                    self.JSONResponse["rm"][tb].append({'num':"remove: "+str(numRemoveRow), 'ID': rowMain.ID})
                     if FileController.hasFile(rowMain):
                         fileController = FileController(path=self.path, db=self.db)
                         row_send = fileController.rmFile(rowMain)

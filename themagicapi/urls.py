@@ -1,3 +1,12 @@
+# @Author: Manuel Rodriguez <valle>
+# @Date:   20-Jul-2017
+# @Email:  valle.mrv@gmail.com
+# @Filename: urls.py
+# @Last modified by:   valle
+# @Last modified time: 09-Aug-2017
+# @License: Apache license vesion 2.0
+
+
 """server URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -18,5 +27,5 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name="index"),
-    url(r"^getfiles/$", views.getfiles, name="getfiles")
+    url(r"^getfiles/$", views.getfiles, name="getfiles"),
 ]

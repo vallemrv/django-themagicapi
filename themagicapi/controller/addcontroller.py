@@ -1,3 +1,12 @@
+# @Author: Manuel Rodriguez <valle>
+# @Date:   20-Jul-2017
+# @Email:  valle.mrv@gmail.com
+# @Filename: addcontroller.py
+# @Last modified by:   valle
+# @Last modified time: 12-Aug-2017
+# @License: Apache license vesion 2.0
+
+
 # -*- coding: utf-8 -*-
 """Controlador para themagicapi
 
@@ -23,16 +32,15 @@ class AddController():
         for k, v in JSONRequire.items():
             if k == "db":
                 pass
-            elif k == "rows":
-                rows = JSONRequire.get("rows")
-                JSONResponse['add'] = []
-                for row in rows:
+            elif type(v) is list:
+                for row in v:
                     for kr, vr in row.items():
-                        self.actionAdd(vr, kr, True)
+                        self.actionAdd(vr, kr)
             else:
-                self.actionAdd(v, k, False)
+                self.actionAdd(v, k)
 
-    def actionAdd(self, row_req, tb, multiple):
+    def actionAdd(self, row_req, tb):
+        self.JSONResponse["add"] = {tb: []}
         row, relations = self.modifyRow(row_req, tb)
         row.save()
         row_send = row.toDICT()
@@ -59,7 +67,7 @@ class AddController():
                     tbName = relation["relationName"]
                     child, relchild = self.modifyRow(r[tbName], tbName)
                     child.save()
-
+                
                 getattr(row, nameKey).add(child)
                 child_send = child.toDICT()
                 if self.fichero:
@@ -70,10 +78,7 @@ class AddController():
                 row_send[nameKey].append(child_send)
 
 
-        if multiple:
-            self.JSONResponse["add"].append(row_send)
-        else:
-            self.JSONResponse["add"] = row_send
+        self.JSONResponse["add"][tb].append(row_send)
 
     def modifyRow(self, row_json, tb, relationship=None):
         model = {}
@@ -153,6 +158,8 @@ class AddController():
 
 
     def getTipo(self, val):
+        val = self.canConvert(val, op='int')
+        val = self.canConvert(val, op='float')
         if type(val) is unicode:
             return ("None", "TEXT")
         elif type(val) is float:
@@ -161,3 +168,16 @@ class AddController():
             return (None, "INTEGER")
         else:
             return ("None", "TEXT")
+
+
+
+    def canConvert(self, value, op='int'):
+        try:
+            if type(value) is unicode:
+                if op == 'int':
+                    value = int(value)
+                if op == 'float' and value.find(".") > 0:
+                    value = float(value)
+            return value
+        except ValueError:
+             return value
