@@ -1,32 +1,20 @@
+# -*- coding: utf-8 -*-
 # @Author: Manuel Rodriguez <valle>
 # @Date:   20-Jul-2017
 # @Email:  valle.mrv@gmail.com
 # @Filename: rmcontroller.py
 # @Last modified by:   valle
-# @Last modified time: 23-Jul-2017
+# @Last modified time: 04-Sep-2017
 # @License: Apache license vesion 2.0
-
-
-# -*- coding: utf-8 -*-
-"""Controlador para themagicapi
-
-    Autor: Manuel Rodriguez
-    Licencia: Apache v2.0
-
-"""
-import os
-import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from valleorm.models import Models
 from filecontroller import FileController
 
 class RmController():
-    def __init__(self, JSONResponse, JSONRequire, path):
+    def __init__(self, JSONResponse, JSONRequire):
         self.JSONResponse = JSONResponse
         self.JSONRequire = JSONRequire
-        self.path = path
-        self.db = JSONRequire.get("db") if 'db' in JSONRequire.get("db") else JSONRequire.get("db")+".db"
+        self.db = JSONRequire.get("db")
         for k, v in JSONRequire.items():
             if k == "db":
                 pass
@@ -41,9 +29,9 @@ class RmController():
 
 
     def actionGet(self, condition, tb):
-        if not Models.exitsTable(self.db, tb, self.path):
+        if not Models.exitsTable(self.db, tb):
             return ''
-        row = Models(path=self.path, dbName=self.db, tableName=tb)
+        row = Models(dbName=self.db, tableName=tb)
         if "ID" in condition:
             row.loadByPk(condition["ID"])
             response = {'num':"remove:" +'1' if row.ID > 0 else '0' , 'ID': row.ID}
@@ -58,14 +46,14 @@ class RmController():
                     for child in rows:
                         response["IDs"].append(child.ID)
                         if FileController.hasFile(child):
-                            fileController = FileController(path=self.path, db=self.db)
+                            fileController = FileController(db=self.db)
                             row_send = fileController.rmFile(child)
 
                         getattr(row, col).remove(child)
 
             if rmRoot:
                 if FileController.hasFile(row):
-                    fileController = FileController(path=self.path, db=self.db)
+                    fileController = FileController(db=self.db)
                     row_send = fileController.rmFile(row)
 
                 row.remove()
@@ -85,7 +73,7 @@ class RmController():
                             response[fieldName] = [{'num':"remove "+str(len(rows)), 'IDs': []}]
                             for row in rows:
                                 if FileController.hasFile(row):
-                                    fileController = FileController(path=self.path, db=self.db)
+                                    fileController = FileController(db=self.db)
                                     row_send = fileController.rmFile(row)
 
                                 getattr(rowMain, fieldName).remove(row)
@@ -96,7 +84,7 @@ class RmController():
                     numRemoveRow += 1
                     self.JSONResponse["rm"][tb].append({'num':"remove: "+str(numRemoveRow), 'ID': rowMain.ID})
                     if FileController.hasFile(rowMain):
-                        fileController = FileController(path=self.path, db=self.db)
+                        fileController = FileController(db=self.db)
                         row_send = fileController.rmFile(rowMain)
 
                     rowMain.remove()

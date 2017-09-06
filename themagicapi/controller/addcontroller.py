@@ -1,34 +1,23 @@
+# -*- coding: utf-8 -*-
+
 # @Author: Manuel Rodriguez <valle>
 # @Date:   20-Jul-2017
 # @Email:  valle.mrv@gmail.com
 # @Filename: addcontroller.py
 # @Last modified by:   valle
-# @Last modified time: 12-Aug-2017
+# @Last modified time: 04-Sep-2017
 # @License: Apache license vesion 2.0
-
-
-# -*- coding: utf-8 -*-
-"""Controlador para themagicapi
-
-    Autor: Manuel Rodriguez
-    Licencia: Apache v2.0
-
-"""
-import os
-import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from valleorm.models import Models
 from filecontroller import FileController
 
 class AddController():
-    def __init__(self, JSONResponse, JSONRequire, path, fichero=None):
+    def __init__(self, JSONResponse, JSONRequire, fichero=None):
         self.JSONResponse = JSONResponse
         self.JSONRequire = JSONRequire
-        self.path = path
         self.fichero = fichero
 
-        self.db = JSONRequire.get("db") if 'db' in JSONRequire.get("db") else JSONRequire.get("db")+".db"
+        self.db = JSONRequire.get("db")
         for k, v in JSONRequire.items():
             if k == "db":
                 pass
@@ -45,7 +34,7 @@ class AddController():
         row.save()
         row_send = row.toDICT()
         if len(relations) <= 0 and self.fichero:
-            filecontroller = FileController(path=self.path, db=self.db)
+            filecontroller = FileController(db=self.db)
             rowfile = filecontroller.addFile(row, self.fichero)
             row_send[row.tableName] = rowfile
         for relation in relations:
@@ -67,11 +56,11 @@ class AddController():
                     tbName = relation["relationName"]
                     child, relchild = self.modifyRow(r[tbName], tbName)
                     child.save()
-                
+
                 getattr(row, nameKey).add(child)
                 child_send = child.toDICT()
                 if self.fichero:
-                    filecontroller = FileController(path=self.path, db=self.db)
+                    filecontroller = FileController(db=self.db)
                     rowfile = filecontroller.addFile(child, self.fichero)
                     child_send = rowfile
 
@@ -84,17 +73,17 @@ class AddController():
         model = {}
         row = None
         if "ID" in row_json:
-            row = Models(path=self.path, dbName=self.db, tableName=tb)
+            row = Models(dbName=self.db, tableName=tb)
             row.loadByPk(row_json.get("ID"))
         else:
-            if Models.exitsTable(path=self.path, dbName=self.db, tableName=tb):
-                model = Models.getModel(path=self.path, dbName=self.db, tableName=tb)
+            if Models.exitsTable(dbName=self.db, tableName=tb):
+                model = Models.getModel(dbName=self.db, tableName=tb)
                 model = self.repare_model(model=model, row=row_json, tb=tb)
             else:
                 model = self.create_model(row_json)
                 if relationship:
                     model["relationship"].append(relationship)
-            row = Models(path=self.path, dbName=self.db, tableName=tb, model=model)
+            row = Models(dbName=self.db, tableName=tb, model=model)
         relations = []
         for key, v in row_json.items():
             if type(row_json[key]) is list  or type(v) is dict:
@@ -136,7 +125,7 @@ class AddController():
                         'fieldTipo': tipo
                     }
                     model['fields'].append(field)
-                    Models.alter(path=self.path, dbName=self.db, tableName=tb, field=field)
+                    Models.alter(dbName=self.db, tableName=tb, field=field)
 
         return model
 

@@ -3,7 +3,7 @@
 # @Email:  valle.mrv@gmail.com
 # @Filename: urls.py
 # @Last modified by:   valle
-# @Last modified time: 09-Aug-2017
+# @Last modified time: 05-Sep-2017
 # @License: Apache license vesion 2.0
 
 
@@ -27,5 +27,6 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name="index"),
+    url(r"^qson_django/$", views.qson_django, name="qson_django"),
     url(r"^getfiles/$", views.getfiles, name="getfiles"),
 ]

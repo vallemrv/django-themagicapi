@@ -1,34 +1,23 @@
+# -*- coding: utf-8 -*-
 # @Author: Manuel Rodriguez <valle>
 # @Date:   20-Jul-2017
 # @Email:  valle.mrv@gmail.com
 # @Filename: getcontroller.py
 # @Last modified by:   valle
-# @Last modified time: 31-Jul-2017
+# @Last modified time: 04-Sep-2017
 # @License: Apache license vesion 2.0
-
-
-# -*- coding: utf-8 -*-
-"""Controlador para themagicapi
-
-    Autor: Manuel Rodriguez
-    Licencia: Apache v2.0
-
-"""
-import os
-import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from valleorm.models import Models
 from filecontroller import FileController
 
 class GetController():
-    def __init__(self, JSONResponse, JSONRequire, path):
+    def __init__(self, JSONResponse, JSONRequire):
         self.JSONResponse = JSONResponse
         self.JSONRequire = JSONRequire
-        self.path = path
+
         JSONResponse['get'] = []
 
-        self.db = JSONRequire.get("db") if 'db' in JSONRequire.get("db") else JSONRequire.get("db")+".db"
+        self.db = JSONRequire.get("db")
         for k, v in JSONRequire.items():
             if k == "db":
                 pass
@@ -44,14 +33,14 @@ class GetController():
 
     def actionGet(self, condition, tb):
         self.JSONResponse['get'] = {tb: []}
-        if not Models.exitsTable(self.db, tb, self.path):
+        if not Models.exitsTable(self.db, tb):
             return ''
-        row = Models(path=self.path, dbName=self.db, tableName=tb)
+        row = Models(dbName=self.db, tableName=tb)
         if "ID" in condition:
             row.loadByPk(condition["ID"])
             row_send = row.toDICT()
             if FileController.hasFile(row):
-                fileController = FileController(path=self.path, db=self.db)
+                fileController = FileController(db=self.db)
                 row_send = fileController.getFile(row)
 
             response = row_send
@@ -70,7 +59,7 @@ class GetController():
                     for child in rows:
                         child_send = child.toDICT()
                         if FileController.hasFile(child):
-                            fileController = FileController(path=self.path, db=self.db)
+                            fileController = FileController(db=self.db)
                             child_send = fileController.getFile(child)
 
                         response[col].append(child_send)
@@ -88,7 +77,7 @@ class GetController():
                         if len(rows) > 0:
                             rowMain_send = rowMain.toDICT()
                             if FileController.hasFile(rowMain):
-                                fileController = FileController(path=self.path, db=self.db)
+                                fileController = FileController(db=self.db)
                                 rowMain_send = fileController.getFile(rowMain)
 
                             response = rowMain_send
@@ -96,7 +85,7 @@ class GetController():
                             for row in rows:
                                 row_send = row.toDICT()
                                 if FileController.hasFile(row):
-                                    fileController = FileController(path=self.path, db=self.db)
+                                    fileController = FileController(db=self.db)
                                     row_send = fileController.getFile(row)
 
                                 response[fieldName].append(row_send)
@@ -105,7 +94,7 @@ class GetController():
                 else:
                     rowMain_send = rowMain.toDICT()
                     if FileController.hasFile(rowMain):
-                        fileController = FileController(path=self.path, db=self.db)
+                        fileController = FileController(db=self.db)
                         rowMain_send = fileController.getFile(rowMain)
 
                     self.JSONResponse["get"][tb].append(rowMain_send)

@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-"""Controlador para themagicapi
-
-    Autor: Manuel Rodriguez
-    Licencia: Apache v2.0
-
-"""
-import os
-import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# @Author: Manuel Rodriguez <valle>
+# @Date:   20-Jul-2017
+# @Email:  valle.mrv@gmail.com
+# @Last modified by:   valle
+# @Last modified time: 04-Sep-2017
+# @License: Apache license vesion 2.0
 
 from valleorm.models import Models
 from themagicapi.models import FilesUpload
 
 class FileController():
-    def __init__(self, path, db):
-        self.path = path
+    def __init__(self, db):
         self.db = db
 
     def addFile(self, row, fichero):
@@ -24,7 +20,7 @@ class FileController():
                 'fieldDato': None,
                 'fieldTipo': 'INTEGER'
             }
-            Models.alter(path=self.path, dbName=self.db, tableName=row.tableName, field=field)
+            Models.alter(dbName=self.db, tableName=row.tableName, field=field)
             row.appnedField(field)
         else:
             id_search = row.id_file_uploader if row.id_file_uploader != 'None' else -1
